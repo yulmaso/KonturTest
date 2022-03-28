@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewmodel"
+            type="com.yulmaso.konturtest.ui.screens.contactDetails.ContactDetailsViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".ui.screens.contactDetails.ContactDetailsFragment">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:elevation="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:padding="15dp">
+
+            <TextView
+                style="@style/TxtBlack20"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewmodel.contact.name}"
+                tools:text="Алексей Плотников" />
+
+            <TextView
+                style="@style/TxtHyperlink"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:autoLink="phone"
+                android:text="@{viewmodel.contact.phone}"
+                tools:text="+7 (950) 746-54-10" />
+
+            <TextView
+                style="@style/TxtGray14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@{viewmodel.contact.temperament}"
+                tools:text="Melancholic" />
+
+            <TextView
+                android:id="@+id/dates_tv"
+                style="@style/TxtGray14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@{viewmodel.educationPeriodStr}"
+                tools:text="01.01.2001 - 02.02.2002" />
+
+            <TextView
+                style="@style/TxtBlack14"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:text="@{viewmodel.contact.biography}"
+                tools:text="Aliqua aliqua magna sit velit enim mollit voluptate mollit magna." />
+
+        </LinearLayout>
+    </LinearLayout>
+</layout>

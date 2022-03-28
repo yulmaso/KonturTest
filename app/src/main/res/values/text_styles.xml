@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="TxtBlack">
+        <item name="android:textColor">@color/text_black</item>
+    </style>
+
+    <style name="TxtBlack14" parent="TxtBlack">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TxtBlack18" parent="TxtBlack">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="TxtBlack20" parent="TxtBlack">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="TxtGray">
+        <item name="android:textColor">@color/text_gray</item>
+    </style>
+
+    <style name="TxtGray14" parent="TxtGray">
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TxtHyperlink">
+        <item name="android:textColorLink">@color/text_hyperlink</item>
+    </style>
+
+    <style name="TxtHyperlink14" parent="TxtHyperlink">
+        <item name="android:textSize">14sp</item>
+    </style>
+</resources>

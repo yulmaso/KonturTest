@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">KonturTest</string>
+    <string name="network_error">Нет подключения к сети</string>
+</resources>
