@@ -11,8 +11,12 @@ import com.yulmaso.konturtest.domain.entity.Contact
 import com.yulmaso.konturtest.domain.useCase.ContactUseCase
 import com.yulmaso.konturtest.ui.BaseViewModel
 import com.yulmaso.konturtest.ui.navigation.Screens
+import com.yulmaso.konturtest.utils.SingleLiveEvent
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.processors.PublishProcessor
 import io.reactivex.rxjava3.schedulers.Schedulers
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 class ContactListViewModel(
     app: Application,
@@ -20,13 +24,9 @@ class ContactListViewModel(
     private val contactUseCase: ContactUseCase
 ): BaseViewModel(app) {
 
-    private val contactsMLive = MutableLiveData<List<Contact>>()
-    val contacts: LiveData<List<Contact>> = contactsMLive
-
-    val searchInput = MutableLiveData<String>()
-
-    private val errorMLive = MutableLiveData<String>()
-    val error: LiveData<String> = errorMLive
+    companion object {
+        private const val PAGE_ITEM_COUNT = 50
+    }
 
     // По дефотлу - true, потому что отображается только при первой загрузке
     private val progressBarVisibilityMLive = MutableLiveData(true)
@@ -34,26 +34,65 @@ class ContactListViewModel(
 
     val isRefreshing = ObservableBoolean()
 
+    private val contactsFullMutable = LinkedList<Contact>()
+    val contactsFull: List<Contact> = contactsFullMutable
+
+    val contactsToAdd = SingleLiveEvent<List<Contact>?>()
+
+    val searchInput = MutableLiveData<String>()
+    val error = SingleLiveEvent<String?>()
+
+    // Pair<Int, Boolean> - Int: limit, Boolean: forceRefresh
+    private val paginator = PublishProcessor.create<Pair<Int, Boolean>>()
+        .also { subscribeForContacts(it) }
+
     init {
-        refreshData()
+        loadMore()
     }
 
+    var noMoreData = false
+        private set
+    private var offset = 0
+
     fun refreshData() {
-        contactUseCase.getContacts(false)
-            .subscribeOn(Schedulers.io())
+        noMoreData = false
+        offset = 0
+
+        paginator.onNext(PAGE_ITEM_COUNT to true)
+    }
+
+    fun loadMore() {
+        paginator.onNext(PAGE_ITEM_COUNT to false)
+    }
+
+    private fun subscribeForContacts(paginator: PublishProcessor<Pair<Int, Boolean>>) {
+        paginator
+            .filter { !noMoreData }
+            .doOnNext {
+                showProgress()
+            }
+            .debounce(100, TimeUnit.MILLISECONDS)
+            .flatMapSingle { (limit, forceRefresh) ->
+                contactUseCase.getContacts(forceRefresh, limit, offset)
+                    .subscribeOn(Schedulers.io())
+                    .doOnError { error.postValue(getApplication<App>().getString(R.string.network_error)) }
+                    .onErrorReturn { listOf() }
+                    .doAfterTerminate { hideProgress() }
+                    .map { limit to it }
+            }
             .observeOn(AndroidSchedulers.mainThread())
-            .doOnSubscribe {
-                isRefreshing.set(true)
-                addDisposable(it)
+            .subscribe { (limit, items) ->
+                if (offset == 0) {
+                    contactsFullMutable.clear()
+                    contactsFullMutable.addAll(items)
+                    contactsToAdd.value = null
+                } else {
+                    contactsFullMutable.addAll(items)
+                    contactsToAdd.value = items
+                }
+                noMoreData =  items.size < limit - 1
+                offset += items.size
             }
-            .doAfterTerminate {
-                isRefreshing.set(false)
-                progressBarVisibilityMLive.value = false
-            }
-            .subscribe(
-                { contactsMLive.value = it },
-                { errorMLive.postValue(getApplication<App>().getString(R.string.network_error)) }
-            )
     }
     
     fun onContactClick(contact: Contact) {
@@ -62,6 +101,15 @@ class ContactListViewModel(
 
     fun onClearClick() {
         searchInput.value = ""
+    }
+
+    private fun showProgress() {
+        isRefreshing.set(true)
+    }
+
+    private fun hideProgress() {
+        isRefreshing.set(false)
+        progressBarVisibilityMLive.postValue(false)
     }
 
 }

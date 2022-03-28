@@ -1,5 +1,6 @@
 package com.yulmaso.konturtest.data.network
 
+import android.util.Log
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
@@ -10,20 +11,20 @@ import java.util.*
 
 class CalendarDeserializer: JsonDeserializer<Calendar> {
 
-    private val calendarFormat by lazy {
-        SimpleDateFormat(STORAGE_DATE_FORMAT_PATTERN, Locale.getDefault())
-    }
-
     override fun deserialize(
         json: JsonElement,
         typeOfT: Type?,
         context: JsonDeserializationContext?
     ): Calendar {
         val s = json.asString
-        s.let {
-            val calendar = Calendar.getInstance()
-            calendar.time = calendarFormat.parse(it)!!
-            return calendar
+        val calendarFormat = SimpleDateFormat(STORAGE_DATE_FORMAT_PATTERN, Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        try {
+            calendar.time = calendarFormat.parse(s)!!
+        } catch (e: Exception) {
+            Log.e("LOG_TAG", "JSON_ERROR", e)
+            calendar.timeInMillis = 0
         }
+        return calendar
     }
 }

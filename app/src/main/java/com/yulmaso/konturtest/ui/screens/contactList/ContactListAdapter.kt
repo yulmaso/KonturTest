@@ -8,13 +8,13 @@ import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.yulmaso.konturtest.databinding.ItemContactBinding
 import com.yulmaso.konturtest.domain.entity.Contact
+import java.util.*
 
 class ContactListAdapter(
     private val listener: ContactListListener
-): RecyclerView.Adapter<ContactListAdapter.ContactViewHolder>(), Filterable {
+): RecyclerView.Adapter<ContactListAdapter.ContactViewHolder>() {
 
-    private val fullList = ArrayList<Contact>()
-    private val listItems = ArrayList<Contact>()
+    private val listItems = LinkedList<Contact>()
 
     interface ContactListListener {
         fun onContactClick(item: Contact)
@@ -34,47 +34,17 @@ class ContactListAdapter(
         return listItems.size
     }
 
-    override fun getFilter() = object : Filter() {
-        override fun performFiltering(searchInput: CharSequence?): FilterResults {
-            val filteredList: MutableList<Contact> = ArrayList()
-
-            if (searchInput == null || searchInput.isEmpty()) {
-                filteredList.addAll(fullList)
-            } else {
-                val filterPattern = searchInput.toString().lowercase().trim()
-                for (item in fullList) {
-                    val phoneWithoutSymbols = item.phone
-                        .replace(" ", "")
-                        .replace("(", "")
-                        .replace(")", "")
-                        .replace("-", "")
-                    if (item.name.lowercase().contains(filterPattern) || // Поиск по имени
-                        phoneWithoutSymbols.contains(filterPattern) || // Поиск по номеру телефона
-                        item.phone.contains(filterPattern)
-                    ) {
-                        filteredList.add(item)
-                    }
-                }
-            }
-
-            return FilterResults().apply { values = filteredList }
-        }
-
-        @SuppressLint("NotifyDataSetChanged")
-        override fun publishResults(p0: CharSequence?, results: FilterResults) {
-            listItems.clear()
-            listItems.addAll(results.values as List<Contact>)
-            notifyDataSetChanged()
-        }
-    }
-
     @SuppressLint("NotifyDataSetChanged")
     fun setItems(items: List<Contact>) {
         listItems.clear()
         listItems.addAll(items)
-        fullList.clear()
-        fullList.addAll(items)
         notifyDataSetChanged()
+    }
+
+    fun addItems(items: List<Contact>) {
+        val newFirst = listItems.size
+        listItems.addAll(items)
+        notifyItemRangeInserted(newFirst, items.size)
     }
 
     inner class ContactViewHolder(

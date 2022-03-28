@@ -14,10 +14,7 @@ interface ContactDao {
     @Query("DELETE FROM contacts")
     fun deleteAll(): Completable
 
-    @Query("SELECT * FROM contacts")
-    fun getAll(): Single<List<ContactDbDto>>
-
-    @Query("SELECT :limit FROM contacts ORDER BY id LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM contacts ORDER BY id LIMIT :limit OFFSET :offset")
     fun getPagedContacts(limit: Int, offset: Int): Single<List<ContactDbDto>>
 
     @Query("SELECT * FROM contacts WHERE name = '%'||:query||'%' OR phone = '%'||:query||'%'")
