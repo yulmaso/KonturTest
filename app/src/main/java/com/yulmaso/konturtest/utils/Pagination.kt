@@ -8,8 +8,10 @@ class Pagination(
     }
 
     enum class LoadType {
+        FIRST_LOAD,
         REFRESH_LOAD,
-        SCROLL_LOAD
+        SCROLL_LOAD,
+        SEARCH_LOAD
     }
 
     var noMoreData = false
@@ -17,21 +19,27 @@ class Pagination(
     var offset = 0
         private set
 
-    fun startLoad(type: LoadType): Boolean {
-        return when (type) {
-            LoadType.REFRESH_LOAD -> {
-                offset = 0
-                noMoreData = false
-                true
-            }
-            LoadType.SCROLL_LOAD -> {
-                noMoreData
-            }
+    var loadType = LoadType.FIRST_LOAD
+        private set
+    var searchInput: String = ""
+        private set
+    var failureOccured = false
+        private set
+
+    fun startLoad(type: LoadType, searchInput: String?): Pagination = synchronized(this) {
+        this.loadType = type
+        this.searchInput = searchInput ?: ""
+        if (type != LoadType.SCROLL_LOAD) {
+            offset = 0
+            noMoreData = false
         }
+        failureOccured = false
+        return this
     }
 
-    fun stopLoad(noMoreData: Boolean = false, failureOccured: Boolean = false) {
-        this.noMoreData = noMoreData
+    fun stopLoad(itemCount: Int? = null, failureOccured: Boolean = false) = synchronized(this) {
+        itemCount?.let { this.noMoreData = itemCount < limit - 1}
         if (!failureOccured) offset += limit
+        this.failureOccured = failureOccured
     }
 }

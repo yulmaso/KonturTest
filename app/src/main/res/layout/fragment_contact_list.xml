@@ -44,6 +44,7 @@
                         app:tint="@color/text_gray" />
 
                     <EditText
+                        android:id="@+id/searchEt"
                         style="@style/TxtBlack18"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
@@ -58,6 +59,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="@{() -> viewmodel.onClearClick()}"
+                        android:visibility="gone"
                         app:srcCompat="@drawable/ic_baseline_clear_24"
                         app:tint="@color/text_gray" />
 
@@ -72,7 +74,7 @@
             <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:onRefreshListener="@{() -> viewmodel.refreshData()}"
+                app:onRefreshListener="@{() -> viewmodel.onRefreshSwipe()}"
                 app:refreshing="@{viewmodel.isRefreshing()}">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -85,6 +87,15 @@
                     tools:listitem="@layout/item_contact" />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+            <TextView
+                android:id="@+id/emptyListTv"
+                style="@style/TxtGray16"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/search_error"
+                android:visibility="gone" />
 
             <FrameLayout
                 android:layout_width="match_parent"

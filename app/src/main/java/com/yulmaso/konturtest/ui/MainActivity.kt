@@ -1,25 +1,26 @@
 package com.yulmaso.konturtest.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.fragment.app.FragmentContainerView
+import androidx.appcompat.app.AppCompatActivity
 import com.github.terrakok.cicerone.NavigatorHolder
-import com.github.terrakok.cicerone.Router
 import com.github.terrakok.cicerone.androidx.AppNavigator
 import com.yulmaso.konturtest.R
-import com.yulmaso.konturtest.ui.navigation.Screens
 import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private val navigatorHolder by inject<NavigatorHolder>()
-    private val router by inject<Router>()
-    private val navigator by lazy { AppNavigator(this, R.id.host_layout) }
+    private val navigator by lazy {
+        AppNavigator(this, R.id.host_layout)
+    }
+
+    private val viewModel by viewModel<MainActivityViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        router.newRootScreen(Screens.contactList())
+        viewModel.onCreate()
     }
 
     override fun onResumeFragments() {

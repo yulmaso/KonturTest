@@ -25,6 +25,10 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="TxtGray16" parent="TxtGray">
+        <item name="android:textSize">16sp</item>
+    </style>
+
     <style name="TxtHyperlink">
         <item name="android:textColorLink">@color/text_hyperlink</item>
     </style>

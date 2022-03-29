@@ -23,10 +23,12 @@ class DbUtilsPreferencesImpl(
         }
     }
 
-    override fun setCacheInsertTime(tag: String, value: Calendar) {
-        sharedPrefs.edit()
-            .putLong(tag + "_value", value.timeInMillis)
-            .putString(tag + "_zone", value.timeZone.id)
-            .apply()
+    override fun setCacheInsertTime(tag: String, value: Calendar): Completable {
+        return Completable.fromAction {
+            sharedPrefs.edit()
+                .putLong(tag + "_value", value.timeInMillis)
+                .putString(tag + "_zone", value.timeZone.id)
+                .apply()
+        }
     }
 }

@@ -24,27 +24,36 @@ class ContactListFragment : BaseFragment<FragmentContactListBinding>(
     override fun initView() {
         binding.viewmodel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
+
         val layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (!viewModel.noMoreData &&
+                if (!viewModel.paginationState.noMoreData &&
                         adapter.itemCount < layoutManager.findLastVisibleItemPosition() + 15)
-                            viewModel.loadMore()
+                            viewModel.loadData(Pagination.LoadType.SCROLL_LOAD)
                 super.onScrolled(recyclerView, dx, dy)
             }
         })
+
+        // Восстанавливаем данные в адаптере при пересоздании фрагмента
+        if (adapter.itemCount == 0 && viewModel.contactsFull.isNotEmpty())
+            adapter.setItems(viewModel.contactsFull)
     }
 
     override fun initObservers() {
         viewModel.contactsToAdd.observeEvent(viewLifecycleOwner) {
+            binding.emptyListTv.visibility =
+                if (it == null && viewModel.contactsFull.isEmpty()) View.VISIBLE else View.GONE
+
             it?.let { adapter.addItems(it) } ?: adapter.setItems(viewModel.contactsFull)
         }
-        viewModel.searchInput.observe(viewLifecycleOwner) {
+        viewModel.searchInput.observeEvent(viewLifecycleOwner) {
             binding.clearIv.visibility = if (it.isEmpty()) View.GONE else View.VISIBLE
+            viewModel.loadData(Pagination.LoadType.SEARCH_LOAD, it)
         }
-        viewModel.error.observe(viewLifecycleOwner) { it?.let { showMessage(it) } }
+        viewModel.error.observeEvent(viewLifecycleOwner) { it?.let { showMessage(it) } }
     }
 
     override fun onContactClick(item: Contact) {
