@@ -4,7 +4,7 @@ class Pagination(
     val limit: Int = DEFAULT_COUNT
 ) {
     companion object {
-        const val DEFAULT_COUNT     = 50
+        const val DEFAULT_COUNT     = 60
     }
 
     enum class LoadType {

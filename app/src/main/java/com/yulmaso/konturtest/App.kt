@@ -26,7 +26,7 @@ class App: Application() {
             } else {
                 // Forward all others to current thread's uncaught exception handler
                 Thread.currentThread().also { thread ->
-                    thread.uncaughtExceptionHandler.uncaughtException(thread, it)
+                    thread.uncaughtExceptionHandler?.uncaughtException(thread, it)
                 }
             }
         }

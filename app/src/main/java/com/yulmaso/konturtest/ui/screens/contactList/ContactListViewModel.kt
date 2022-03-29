@@ -56,7 +56,7 @@ class ContactListViewModel(
         paginator
             .filter { !it.noMoreData }
             .doOnNext { if (it.loadType != Pagination.LoadType.SCROLL_LOAD) showProgress() }
-            .debounce(50, TimeUnit.MILLISECONDS)
+            .debounce(80, TimeUnit.MILLISECONDS)
             .flatMapSingle { paginationState ->
                 contactUseCase.getContacts(paginationState)
                     .subscribeOn(Schedulers.io())

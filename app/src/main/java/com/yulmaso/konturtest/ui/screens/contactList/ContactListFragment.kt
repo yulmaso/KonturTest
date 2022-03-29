@@ -31,7 +31,7 @@ class ContactListFragment : BaseFragment<FragmentContactListBinding>(
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (!viewModel.paginationState.noMoreData &&
-                        adapter.itemCount < layoutManager.findLastVisibleItemPosition() + 15)
+                        adapter.itemCount < layoutManager.findLastVisibleItemPosition() + 20)
                             viewModel.loadData(Pagination.LoadType.SCROLL_LOAD)
                 super.onScrolled(recyclerView, dx, dy)
             }
